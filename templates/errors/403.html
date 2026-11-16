@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}You don't have access to this page{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><div class="mc-card text-center py-5">
+  <div class="error-code mb-2">403</div>
+  <h1 class="h3 fw-bold mb-2">You don't have access to this page</h1>
+  <p class="mc-muted">{{ reason|default:"This page is only for counsellors or for the owner of this result." }}</p>
+  <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house me-1"></i>Go to the home page</a>
+  <a href="{% url 'resources:list' %}" class="btn btn-outline-primary">Find support</a>
+</div></div></div>
+{% endblock %}

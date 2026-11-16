@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Delete my data{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="mc-card">
+      <h1 class="h4 fw-bold">Delete my data</h1>
+      <p>You have <strong>{{ count }}</strong> saved result{{ count|pluralize }}. Deletion is permanent and can't be undone.</p>
+      <form method="post" class="mb-3">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="results">
+        <button type="submit" class="btn btn-outline-danger" {% if not count %}disabled{% endif %}>Delete all my saved results</button>
+        <div class="form-text">Keeps your account; removes every saved score.</div>
+      </form>
+      <hr>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="account">
+        <button type="submit" class="btn btn-danger">Delete my account and all data</button>
+        <div class="form-text">Removes your login, profile and every saved score.</div>
+      </form>
+      <a href="{% url 'accounts:dashboard' %}" class="btn btn-link px-0 mt-3">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

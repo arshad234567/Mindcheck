@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load mindcheck_tags %}
+{% block title %}Get support{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 page-head">
+  <div>
+    <p class="eyebrow mb-1">Support directory</p>
+    <h1 class="h2 mb-1">{% if category %}{{ category.name }}{% else %}Where to get support{% endif %}</h1>
+    {% if category.description %}<p class="mc-muted mb-0">{{ category.description }}</p>{% endif %}
+  </div>
+  {% if is_counsellor %}<a href="{% url 'resources:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add a resource</a>{% endif %}
+</div>
+
+<form method="get" action="{% url 'resources:list' %}" class="mc-card mb-3 py-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <label class="form-label small fw-semibold" for="{{ form.q.id_for_label }}">Search</label>
+      <div class="search-bar"><i class="bi bi-search"></i>{{ form.q }}</div>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold" for="{{ form.category.id_for_label }}">Category</label>
+      {{ form.category }}
+    </div>
+    <div class="col-md-2">
+      <div class="form-check mt-2">{{ form.crisis_only }}
+        <label class="form-check-label small" for="{{ form.crisis_only.id_for_label }}">{{ form.crisis_only.label }}</label></div>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-search me-1"></i>Search</button>
+    </div>
+  </div>
+</form>
+
+<div class="d-flex flex-wrap gap-2 mb-4 filter-chips">
+  <a href="{% url 'resources:list' %}" class="btn btn-sm {% if not category %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+  {% for c in categories %}
+    <a href="{% url 'resources:by_category' c.slug %}" class="btn btn-sm {% if category and category.pk == c.pk %}btn-primary{% else %}btn-outline-primary{% endif %}">{{ c.name }}</a>
+  {% endfor %}
+</div>
+
+{% if query %}<p class="mc-muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }} for "<strong>{{ query }}</strong>".</p>{% endif %}
+
+<div class="row g-3">
+  {% for resource in page_obj %}
+    <div class="col-md-6 col-lg-4">{% include "partials/resource_card.html" %}</div>
+  {% empty %}
+    <div class="col-12"><div class="mc-card text-center mc-muted py-5"><i class="bi bi-search fs-2 d-block mb-2"></i>No resources match your search. Try another word, or call {{ HELPLINE_NAME }} on {{ HELPLINE_NUMBER }}.</div></div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+  <nav class="mt-4" aria-label="Pages">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="{% query_with querystring page=page_obj.previous_page_number %}">Previous</a></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="{% query_with querystring page=page_obj.next_page_number %}">Next</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
+{% endblock %}

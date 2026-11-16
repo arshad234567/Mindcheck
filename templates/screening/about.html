@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load mindcheck_tags %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <p class="eyebrow mb-1">About MindCheck</p>
+    <h1 class="h2 mb-3">A screening and signposting tool</h1>
+    <p>Many people notice changes in their mood, stress or sleep but aren't sure whether it's serious enough to seek help.
+       Stigma, cost and access often delay that step. MindCheck offers three short, widely used questionnaires in private,
+       explains the result in plain language, and points to practical next steps and trusted support.</p>
+    {% include "partials/disclaimer.html" %}
+
+    <h2 class="h5 fw-bold mt-4">The screening tools and their score bands</h2>
+    {% for tool in tools %}
+      <div class="mc-card mb-3">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+          <h3 class="h6 fw-bold mb-1">{{ tool.short_name }} · {{ tool.domain }}</h3>
+          <span class="small mc-muted">Score range 0 to {{ tool.max_final_score }}{% if tool.score_multiplier > 1 %} (raw total × {{ tool.score_multiplier }}){% endif %}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm mb-2">
+            <thead><tr><th>Score</th><th>Band</th><th>Action level</th></tr></thead>
+            <tbody>
+              {% for band in tool.bands.all %}
+                <tr><td>{{ band.min_score }} to {{ band.max_score }}</td><td>{{ band.label }}</td>
+                    <td><span class="tier-badge {{ band.guidance.tier|tier_class }}">{{ band.guidance }}</span></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="small mc-muted mb-0">Source: {{ tool.citation }}</p>
+      </div>
+    {% endfor %}
+
+    <h2 class="h5 fw-bold mt-4">Safety and privacy</h2>
+    <ul>
+      <li>If PHQ-9 question 9 (thoughts of self-harm) is answered above 0, a support screen with Tele-MANAS and 112 appears before the result. You can always continue to your result.</li>
+      <li>All scoring and safety checks run on the server, so they can't be skipped from the browser.</li>
+      <li>Without an account, nothing is saved. Results stay in your browser session and disappear when you close it.</li>
+      <li>With an account, only the tool, score, band and date are saved, never your individual answers. You can delete any result or your whole account at any time.</li>
+      <li>Data handling follows the principles of India's Digital Personal Data Protection Act, 2023: consent, purpose limitation, minimisation and erasure.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

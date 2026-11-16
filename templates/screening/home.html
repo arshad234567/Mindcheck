@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load mindcheck_tags %}
+{% block title %}Private mental health check{% endblock %}
+
+{% block content %}
+<section class="mc-hero mb-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-7">
+      <p class="eyebrow mb-3"><i class="bi bi-shield-lock me-1"></i>Private · Free · 2 to 3 minutes</p>
+      <h1 class="mb-3">Not sure if what you're feeling is worth talking about?</h1>
+      <p class="lead mb-4">
+        Answer a short, widely used questionnaire in private. You'll get a plain-language explanation
+        of your answers, practical next steps, and where to find support if you need it.
+      </p>
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'screening:tools' %}" class="btn btn-primary btn-lg">Start a screening <i class="bi bi-arrow-right ms-1"></i></a>
+        <a href="{% url 'resources:list' %}" class="btn btn-outline-primary btn-lg">Find support</a>
+      </div>
+      <div class="trust-row">
+        <span><i class="bi bi-person-x"></i>No account needed</span>
+        <span><i class="bi bi-database-slash"></i>Nothing saved in private mode</span>
+        <span><i class="bi bi-patch-check"></i>Validated questionnaires</span>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <svg class="hero-art" viewBox="0 0 420 340" role="img" aria-label="Illustration of a calm check-in card">
+        <circle cx="300" cy="90" r="70" fill="#d3ebe4"/>
+        <circle cx="90" cy="270" r="55" fill="#fbe2bb"/>
+        <rect x="70" y="50" width="280" height="230" rx="26" fill="#ffffff" stroke="#dfe7e3"/>
+        <rect x="98" y="82" width="120" height="12" rx="6" fill="#1f6f68"/>
+        <rect x="98" y="104" width="190" height="9" rx="4.5" fill="#dfe7e3"/>
+        <g fill="#f0f7f4" stroke="#dfe7e3">
+          <rect x="98" y="132" width="224" height="34" rx="12"/>
+          <rect x="98" y="176" width="224" height="34" rx="12"/>
+        </g>
+        <rect x="98" y="220" width="224" height="34" rx="12" fill="#e2f0ec" stroke="#1f6f68" stroke-width="1.5"/>
+        <circle cx="118" cy="149" r="7" fill="#fff" stroke="#9cc7bd" stroke-width="2"/>
+        <circle cx="118" cy="193" r="7" fill="#fff" stroke="#9cc7bd" stroke-width="2"/>
+        <circle cx="118" cy="237" r="7" fill="#1f6f68"/>
+        <rect x="136" y="145" width="110" height="8" rx="4" fill="#cfdcd7"/>
+        <rect x="136" y="189" width="140" height="8" rx="4" fill="#cfdcd7"/>
+        <rect x="136" y="233" width="96" height="8" rx="4" fill="#1f6f68" opacity=".55"/>
+        <circle cx="340" cy="268" r="34" fill="#1f6f68"/>
+        <path d="M324 268l11 11 21-22" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="d-flex justify-content-between align-items-end mb-3">
+  <div>
+    <p class="eyebrow mb-1">Screenings</p>
+    <h2 class="section-title h3 mb-0">Choose a questionnaire</h2>
+  </div>
+  <a href="{% url 'screening:tools' %}" class="d-none d-md-inline fw-semibold text-decoration-none">See all <i class="bi bi-arrow-right"></i></a>
+</div>
+<div class="row g-3 mb-5">
+  {% for tool in tools %}
+    <div class="col-md-4">
+      <a href="{{ tool.get_absolute_url }}" class="text-decoration-none text-reset">
+        <div class="mc-card mc-card-hover tool-card">
+          <span class="icon-tile"><i class="bi {{ tool.slug|tool_icon }}"></i></span>
+          <div>
+            <p class="eyebrow mb-1">{{ tool.domain }}</p>
+            <h3 class="h5 fw-bold mb-1">{{ tool.short_name }}</h3>
+            <p class="mc-muted small mb-0">{{ tool.description }}</p>
+          </div>
+          <div class="meta mt-auto"><span><i class="bi bi-list-ol me-1"></i>{{ tool.item_count }} question{{ tool.item_count|pluralize }}</span><span><i class="bi bi-clock me-1"></i>~{{ tool.minutes_to_complete }} min</span></div>
+          <span class="go">Start {{ tool.short_name }} <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </a>
+    </div>
+  {% empty %}
+    <p class="mc-muted">No screenings are available right now.</p>
+  {% endfor %}
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="mc-card h-100">
+      <h2 class="h5 fw-bold mb-3">How it works</h2>
+      <ol class="steps">
+        <li>Agree to the short privacy notice.</li>
+        <li>Answer questions about the last two weeks.</li>
+        <li>The server scores your answers and checks for safety concerns.</li>
+        <li>See what your answers suggest, with next steps and support.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="mc-card h-100">
+      <span class="icon-tile accent mb-3"><i class="bi bi-signpost-split"></i></span>
+      <h2 class="h5 fw-bold">Screens and signposts</h2>
+      <p class="mb-2">MindCheck helps you understand your answers and decide on a next step.</p>
+      <p class="mb-0 mc-muted small">It does <strong>not</strong> diagnose, treat, or replace a doctor or counsellor, and never gives medication advice.</p>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="mc-card h-100">
+      <h2 class="h6 fw-bold mb-3"><i class="bi bi-telephone me-1"></i>Support available now</h2>
+      {% for r in crisis_lines %}
+        <div class="mb-3"><span class="mc-muted small">{{ r.name|truncatechars:34 }}</span><br>
+          <a class="helpline-number fs-4" href="tel:{{ r.phone }}">{{ r.phone }}</a></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

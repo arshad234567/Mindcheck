@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Before you start{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="mc-card p-lg-5">
+      <span class="icon-tile mb-3"><i class="bi bi-shield-check"></i></span>
+      <p class="eyebrow mb-1">Privacy and consent</p>
+      <h1 class="h3 mb-3">Before you start</h1>
+      <ul class="advice-list mb-4">
+        <li><i class="bi bi-check2-circle"></i><span>MindCheck is a <strong>screening tool</strong>. It shows what your answers suggest; it does not diagnose.</span></li>
+        {% if user.is_authenticated %}
+          <li><i class="bi bi-check2-circle"></i><span>Because you're signed in, we save <strong>only</strong> the questionnaire name, your total score, the band and the date, so you can see your progress. Your individual answers are never stored.</span></li>
+          <li><i class="bi bi-check2-circle"></i><span>You can choose not to save any result, and you can delete your history or your account at any time.</span></li>
+        {% else %}
+          <li><i class="bi bi-check2-circle"></i><span>You're not signed in, so <strong>nothing is saved</strong> to our database. Your result stays in this browser session and is removed when you close the browser.</span></li>
+        {% endif %}
+        <li><i class="bi bi-check2-circle"></i><span>If your answers suggest you may be at risk, we'll show you free support contacts first.</span></li>
+        <li><i class="bi bi-check2-circle"></i><span>Your data is handled under the principles of India's Digital Personal Data Protection Act, 2023.</span></li>
+      </ul>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="form-check mb-4 p-3 rounded-3" style="background:var(--mc-primary-tint)">
+          <input class="form-check-input ms-0 me-2" type="checkbox" name="agree" value="yes" id="agree">
+          <label class="form-check-label fw-semibold" for="agree">I understand and agree to continue.</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+        <a href="{% url 'home' %}" class="btn btn-link">Not now</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

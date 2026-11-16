@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load mindcheck_tags %}
+{% block title %}Screenings{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <p class="eyebrow mb-1">Screenings</p>
+  <h1 class="h2 mb-2">Choose a questionnaire</h1>
+  <p class="lead mb-0">Each one asks about the last two weeks. Answer honestly; there are no right or wrong answers.</p>
+</div>
+
+<div class="row g-3">
+  {% for tool in tools %}
+    <div class="col-md-6 col-lg-4">
+      <div class="mc-card mc-card-hover tool-card">
+        <span class="icon-tile"><i class="bi {{ tool.slug|tool_icon }}"></i></span>
+        <div>
+          <p class="eyebrow mb-1">{{ tool.domain }}</p>
+          <h2 class="h5 fw-bold mb-1">{{ tool.name }}</h2>
+          <p class="mc-muted small mb-0">{{ tool.description }}</p>
+        </div>
+        <div class="meta mt-auto"><span><i class="bi bi-list-ol me-1"></i>{{ tool.item_count }} questions</span><span><i class="bi bi-clock me-1"></i>~{{ tool.minutes_to_complete }} min</span></div>
+        <a href="{% url 'screening:take' tool.slug %}" class="btn btn-primary">Start {{ tool.short_name }}</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="mc-muted">No screenings are available right now.</p>
+  {% endfor %}
+</div>
+{% include "partials/disclaimer.html" %}
+{% endblock %}

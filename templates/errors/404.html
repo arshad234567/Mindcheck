@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}We couldn't find that page{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><div class="mc-card text-center py-5">
+  <div class="error-code mb-2">404</div>
+  <h1 class="h3 fw-bold mb-2">We couldn't find that page</h1>
+  <p class="mc-muted">Nothing lives at <code>{{ path }}</code>. It may have been moved, or a result you are looking for may have been deleted.</p>
+  <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house me-1"></i>Go to the home page</a>
+  <a href="{% url 'resources:list' %}" class="btn btn-outline-primary">Find support</a>
+</div></div></div>
+{% endblock %}

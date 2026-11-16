@@ -1,0 +1,106 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MindCheck: private mental health screening and support signposting.">
+  <meta name="theme-color" content="#1f6f68">
+  <title>{% block title %}Home{% endblock %} · {{ SITE_NAME }}</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <a class="visually-hidden-focusable" href="#main">Skip to content</a>
+
+  <div class="helpline-strip py-2 no-print">
+    <div class="container text-center">
+      <i class="bi bi-telephone-fill me-1"></i>
+      Need to talk to someone now? {{ HELPLINE_NAME }} is free and open 24/7:
+      <a href="tel:{{ HELPLINE_NUMBER }}">{{ HELPLINE_NUMBER }}</a> or <a href="tel:{{ HELPLINE_ALT|cut:'-' }}">{{ HELPLINE_ALT }}</a>.
+      <span class="d-none d-md-inline">In immediate danger, call <a href="tel:112">112</a>.</span>
+    </div>
+  </div>
+
+  {% with url_name=request.resolver_match.url_name %}
+  <nav class="navbar navbar-expand-lg mc-nav py-2">
+    <div class="container">
+      <a class="navbar-brand mc-brand" href="{% url 'home' %}">{% include "partials/logo.html" %}{{ SITE_NAME }}</a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav mx-lg-auto gap-lg-1 mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link {% if url_name == 'tools' or url_name == 'take' %}active{% endif %}" href="{% url 'screening:tools' %}"><i class="bi bi-ui-checks me-1"></i>Screenings</a></li>
+          <li class="nav-item"><a class="nav-link {% if url_name == 'list' or url_name == 'by_category' or url_name == 'detail' %}active{% endif %}" href="{% url 'resources:list' %}"><i class="bi bi-life-preserver me-1"></i>Get support</a></li>
+          {% if user.is_authenticated and not is_counsellor %}
+            <li class="nav-item"><a class="nav-link {% if url_name == 'history' %}active{% endif %}" href="{% url 'screening:history' %}"><i class="bi bi-graph-up me-1"></i>My history</a></li>
+          {% endif %}
+          {% if is_counsellor %}
+            <li class="nav-item"><a class="nav-link {% if url_name == 'counsellor' %}active{% endif %}" href="{% url 'screening:counsellor' %}"><i class="bi bi-clipboard2-data me-1"></i>Counsellor area</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link {% if url_name == 'about' %}active{% endif %}" href="{% url 'about' %}"><i class="bi bi-info-circle me-1"></i>About</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+            <a class="btn btn-sm btn-outline-primary user-chip" href="{% url 'accounts:dashboard' %}">
+              <span class="avatar">{{ user.first_name|default:user.username|first|upper }}</span>{{ user.first_name|default:user.username|truncatechars:16 }}
+            </a>
+            <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-link text-decoration-none"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button>
+            </form>
+          {% else %}
+            <a class="btn btn-sm btn-link text-decoration-none" href="{% url 'accounts:login' %}">Sign in</a>
+            <a class="btn btn-sm btn-primary" href="{% url 'accounts:register' %}">Create account</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+  {% endwith %}
+
+  <main id="main" class="py-4 py-lg-5">
+    <div class="container">
+      {% include "partials/messages.html" %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="mc-footer pt-5 pb-4 mt-4">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <a class="mc-brand text-decoration-none mb-2" href="{% url 'home' %}">{% include "partials/logo.html" %}{{ SITE_NAME }}</a>
+          <p class="mt-2 mb-0">A private screening and signposting tool. It does not diagnose and does not replace a doctor or counsellor.</p>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h6 class="mb-3">Explore</h6>
+          <ul class="list-unstyled mb-0 d-grid gap-2">
+            <li><a href="{% url 'screening:tools' %}">Screenings</a></li>
+            <li><a href="{% url 'resources:list' %}">Support directory</a></li>
+            <li><a href="{% url 'about' %}">About and privacy</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-4">
+          <h6 class="mb-3">Urgent help</h6>
+          <ul class="list-unstyled mb-0 d-grid gap-2">
+            <li><i class="bi bi-telephone me-1"></i>{{ HELPLINE_NAME }}: <a href="tel:{{ HELPLINE_NUMBER }}" class="fw-bold">{{ HELPLINE_NUMBER }}</a></li>
+            <li><i class="bi bi-exclamation-octagon me-1"></i>Emergency: <a href="tel:112" class="fw-bold">112</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr class="my-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between gap-2 small mc-muted">
+        <span>&copy; {% now "Y" %} MindCheck · INT402 project, Lovely Professional University</span>
+        <span>Built with Django</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

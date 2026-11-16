@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load mindcheck_tags %}
+{% block title %}My dashboard{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <p class="eyebrow mb-1">My dashboard</p>
+  <h1 class="h2 mb-1">Hello, {{ user.first_name|default:user.username }}</h1>
+  <p class="mc-muted mb-0">You have {{ total }} saved result{{ total|pluralize }}.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  {% for item in latest_by_tool %}
+    <div class="col-md-4">
+      <div class="mc-card mc-card-hover h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-3 mb-3"><span class="icon-tile"><i class="bi {{ item.tool.slug|tool_icon }}"></i></span>
+        <div><p class="eyebrow mb-0">{{ item.tool.domain }}</p><h2 class="h5 fw-bold mb-0">{{ item.tool.short_name }}</h2></div></div>
+        {% if item.latest %}
+          <p class="mb-1">Latest: <strong>{{ item.latest.final_score }}</strong>
+            <span class="tier-badge {{ item.latest.band.guidance.tier|tier_class }}">{{ item.latest.band.label }}</span></p>
+          <p class="small mc-muted flex-grow-1">{{ item.latest.created_at|date:"j M Y" }} · {{ item.latest.created_at|timesince }} ago</p>
+        {% else %}
+          <p class="small mc-muted flex-grow-1">Not taken yet.</p>
+        {% endif %}
+        <a href="{{ item.tool.get_absolute_url }}" class="btn btn-sm btn-primary">{% if item.latest %}Retake{% else %}Start{% endif %}</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="mc-card h-100">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 fw-bold mb-0">Recent results</h2>
+        <a href="{% url 'screening:history' %}" class="small">See all and trends</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for a in recent %}
+          <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+            <span><strong>{{ a.tool.short_name }}</strong> · {{ a.created_at|date:"j M" }}</span>
+            <span>{{ a.final_score }} <span class="tier-badge {{ a.band.guidance.tier|tier_class }}">{{ a.band.label }}</span></span>
+          </li>
+        {% empty %}
+          <li class="list-group-item px-0 mc-muted">No results yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="mc-card h-100">
+      <span class="icon-tile accent mb-3"><i class="bi bi-shield-lock"></i></span>
+      <h2 class="h6 fw-bold">Your privacy</h2>
+      <p class="small">We store only scores, bands and dates. Untick "Save this result" on any questionnaire to keep a result private.</p>
+      <a href="{% url 'accounts:delete_my_data' %}" class="btn btn-sm btn-outline-danger">Delete my data</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

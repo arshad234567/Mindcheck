@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static mindcheck_tags %}
+{% block title %}{{ tool.short_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="d-flex gap-3 align-items-start mb-2">
+      <span class="icon-tile"><i class="bi {{ tool.slug|tool_icon }}"></i></span>
+      <div>
+        <p class="eyebrow mb-1">{{ tool.domain }}</p>
+        <h1 class="h3 mb-1">{{ tool.name }} ({{ tool.short_name }})</h1>
+        <p class="mc-muted mb-0">{{ tool.instructions }}</p>
+      </div>
+    </div>
+
+    <div class="progress-sticky">
+      <div class="d-flex justify-content-between align-items-center small mc-muted mb-2">
+        <span id="progress-label" class="fw-semibold">0 of {{ tool.questions.count }} answered</span>
+        <span class="mode-pill">{% if user.is_authenticated %}<i class="bi bi-person-check"></i>Signed in{% else %}<i class="bi bi-incognito"></i>Private mode · nothing saved{% endif %}</span>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" id="progress-bar" style="width:0%" aria-valuenow="0"></div>
+      </div>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>
+    {% endif %}
+
+    <form method="post" id="screening-form" data-total="{{ tool.questions.count }}" novalidate>
+      {% csrf_token %}
+      {% for field in form.question_fields %}
+        <fieldset class="question-card {% if field.errors %}has-error{% endif %}" id="q-{{ field|field_number }}">
+          <legend class="fs-6 fw-semibold mb-0 d-flex align-items-start">
+            <span class="question-number">{{ field|field_number }}</span><span>{{ field.label }}</span>
+          </legend>
+          <div class="choice-grid">
+            {% for radio in field %}
+              <label for="{{ radio.id_for_label }}">
+                {{ radio.tag }}<span>{{ radio.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li><i class="bi bi-exclamation-circle me-1"></i>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </fieldset>
+      {% endfor %}
+
+      {% if form.save_result %}
+        <div class="mc-card flat py-3 mb-3">
+          <div class="form-check mb-0">
+            {{ form.save_result }}
+            <label class="form-check-label" for="{{ form.save_result.id_for_label }}">{{ form.save_result.label }}</label>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <button type="submit" class="btn btn-primary btn-lg">See my result <i class="bi bi-arrow-right ms-1"></i></button>
+        <a href="{% url 'screening:tools' %}" class="btn btn-link">Cancel</a>
+      </div>
+    </form>
+    {% include "partials/disclaimer.html" %}
+    <p class="small mc-muted">Source: {{ tool.citation }}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/progress.js' %}"></script>{% endblock %}

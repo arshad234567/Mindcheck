@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Support is available{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="crisis-card">
+      <span class="icon-tile mb-3"><i class="bi bi-heart"></i></span>
+      <h1 class="h2 mb-3">Thank you for answering honestly</h1>
+      <p class="fs-5 mb-4" style="color:var(--mc-ink-soft)">Some of your answers suggest you may be going through a very difficult time, and may have had
+        thoughts of hurting yourself or of being better off dead. You don't have to handle this alone.
+        Talking to someone can help, and support is available right now.</p>
+
+      <div class="row g-3 mb-4">
+        {% for r in resources %}
+          <div class="col-md-6">
+            <div class="helpline-tile">
+              <div class="small mc-muted fw-semibold text-uppercase" style="letter-spacing:.06em">{{ r.category.name }}</div>
+              <div class="fw-bold mb-1">{{ r.name }}</div>
+              <a class="helpline-number" href="tel:{{ r.phone|cut:'-'|cut:' ' }}"><i class="bi bi-telephone-fill fs-5 me-1"></i>{{ r.phone }}</a>
+              {% if r.alt_phone %}<div class="small">or {{ r.alt_phone }}</div>{% endif %}
+              <div class="small mc-muted">{{ r.hours }}{% if r.is_free %} · Free{% endif %}{% if r.location %} · {{ r.location }}{% endif %}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <ul class="advice-list">
+        <li><i class="bi bi-exclamation-octagon"></i><span>If you feel you might act on these thoughts, or you're in immediate danger, please call <strong>112</strong> now
+          or go to the nearest hospital emergency department.</span></li>
+        <li><i class="bi bi-people"></i><span>It can also help to reach out to someone you trust nearby: a friend, a family member, a warden or a teacher.</span></li>
+      </ul>
+      <p class="verified mb-4"><i class="bi bi-patch-check-fill"></i>Contact details last verified {{ resources.0.last_verified|date:"j F Y" }}.</p>
+
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ next_url }}" class="btn btn-primary btn-lg">Continue to my result <i class="bi bi-arrow-right ms-1"></i></a>
+        <a href="{% url 'resources:list' %}" class="btn btn-outline-primary btn-lg">See all support options</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="row g-4 align-items-stretch">
+    <div class="col-lg-5 d-none d-lg-block">
+      <div class="auth-side">
+        <span class="blob"></span>
+        <h2 class="h3 mb-2">Welcome back</h2>
+        <p class="mb-0">Sign in to save your scores and see how they change over time.</p>
+        <ul>
+          <li><i class="bi bi-graph-up"></i>Trend charts for every questionnaire</li>
+          <li><i class="bi bi-database-lock"></i>Only totals and dates are stored</li>
+          <li><i class="bi bi-trash3"></i>Delete your data whenever you like</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="mc-card p-lg-5 h-100">
+        <h1 class="h3 mb-1">Sign in</h1>
+        <p class="mc-muted mb-4">Use the username and password you registered with.</p>
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {{ field.errors }}
+            </div>
+          {% endfor %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="btn btn-primary btn-lg w-100 mt-2">Sign in</button>
+        </form>
+        <p class="small mc-muted mt-4 mb-0">New here? <a href="{% url 'accounts:register' %}">Create an account</a>, or
+          <a href="{% url 'screening:tools' %}">continue privately without one</a>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

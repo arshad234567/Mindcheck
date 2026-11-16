@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static mindcheck_tags %}
+{% block title %}My history{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 page-head">
+  <div>
+    <p class="eyebrow mb-1">My history</p>
+    <h1 class="h2 mb-1">How your scores have changed</h1>
+    <p class="mc-muted mb-0">Only totals, bands and dates are stored. Your answers never are.</p>
+  </div>
+  <a href="{% url 'accounts:delete_my_data' %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3 me-1"></i>Delete my data</a>
+</div>
+
+{% if charts %}
+  <div class="row g-3 mb-4">
+    {% for c in charts %}
+      <div class="col-md-6 col-xl-4">
+        <div class="mc-card chart-card h-100">
+          <div class="d-flex align-items-center gap-2 mb-1"><span class="icon-tile sm"><i class="bi {{ c.slug|tool_icon }}"></i></span><h2 class="h6 fw-bold mb-0">{{ c.name }}</h2></div>
+          <p class="small mc-muted mb-2">{% if c.higher_is_better %}Higher is better{% else %}Lower is better{% endif %} · max {{ c.max }}</p>
+          <canvas id="chart-{{ c.slug }}" height="180" aria-label="{{ c.name }} score trend" role="img"></canvas>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {{ charts|json_script:"chart-data" }}
+{% endif %}
+
+<form method="get" class="mc-card mb-3 py-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-sm-5">
+      <label for="tool" class="form-label small fw-semibold">Questionnaire</label>
+      <select name="tool" id="tool" class="form-select">
+        <option value="">All</option>
+        {% for t in tools %}<option value="{{ t.slug }}" {% if t.slug == selected_tool %}selected{% endif %}>{{ t.short_name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-4">
+      <label for="tier" class="form-label small fw-semibold">Level</label>
+      <select name="tier" id="tier" class="form-select">
+        <option value="">All</option>
+        {% for value, label in tiers %}<option value="{{ value }}" {% if value == selected_tier %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-sm-3 d-flex gap-2">
+      <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-funnel me-1"></i>Filter</button>
+      <a class="btn btn-outline-primary" href="{% url 'screening:history' %}">Reset</a>
+    </div>
+  </div>
+</form>
+
+<div class="mc-card p-0">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr><th>Date</th><th>Questionnaire</th><th>Score</th><th>Band</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+        {% for a in assessments %}
+          <tr>
+            <td>{{ a.created_at|date:"j M Y" }}<br><span class="small mc-muted">{{ a.created_at|timesince }} ago</span></td>
+            <td>{{ a.tool.short_name }}</td>
+            <td><strong>{{ a.final_score }}</strong> <span class="small mc-muted">/ {{ a.tool.max_final_score }}</span></td>
+            <td><span class="tier-badge {{ a.band.guidance.tier|tier_class }}">{{ a.band.label }}</span></td>
+            <td class="text-end text-nowrap">
+              <a href="{{ a.get_absolute_url }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye me-1"></i>View</a>
+              <a href="{% url 'screening:delete_assessment' a.pk %}" class="btn btn-sm btn-outline-danger" aria-label="Delete"><i class="bi bi-trash3"></i></a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-center mc-muted py-4">No results match. <a href="{% url 'screening:tools' %}">Take a screening</a>.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="small mc-muted mt-2">Showing {{ assessments|length }} result{{ assessments|length|pluralize }}.</p>
+{% endblock %}
+
+{% block extra_js %}
+{% if charts %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+  Chart.defaults.font.family = "Inter, Segoe UI, sans-serif";
+  // Draws one line chart per questionnaire from the data the view passed in.
+  const charts = JSON.parse(document.getElementById("chart-data").textContent);
+  charts.forEach(function (c) {
+    new Chart(document.getElementById("chart-" + c.slug), {
+      type: "line",
+      data: { labels: c.labels, datasets: [{ label: c.name, data: c.scores, borderColor: "#1f6f68",
+              backgroundColor: "rgba(31,111,104,.10)", fill: true, tension: .35, pointRadius: 4,
+              pointBackgroundColor: "#ffffff", pointBorderWidth: 2, borderWidth: 2.5 }] },
+      options: { plugins: { legend: { display: false } },
+                 scales: { y: { min: 0, max: c.max, grid: { color: "#eef2f0" }, ticks: { color: "#5f716e" } },
+                           x: { grid: { display: false }, ticks: { color: "#5f716e" } } } }
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

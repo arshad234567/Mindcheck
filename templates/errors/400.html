@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Something was wrong with that request{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><div class="mc-card text-center py-5">
+  <div class="error-code mb-2">400</div>
+  <h1 class="h3 fw-bold mb-2">Something was wrong with that request</h1>
+  <p class="mc-muted">The page couldn't understand what was sent. Please go back and try again.</p>
+  <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house me-1"></i>Go to the home page</a>
+  <a href="{% url 'resources:list' %}" class="btn btn-outline-primary">Find support</a>
+</div></div></div>
+{% endblock %}
